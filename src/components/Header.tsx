@@ -10,7 +10,7 @@ export default function Header() {
                 {isAuth && user ? (
                     <div className="flex float-end">
                         <Link to="/profile" className="flex items-center gap-2">
-                            <span className="text-sm font-medium">{user.firstName}</span>
+                            <span className="text-sm font-medium">{user.fullName}</span>
                             {user.image && (
                                 <img
                                     src={user.image.startsWith('http') ? user.image : `http://localhost:5254/images/${user.image}`}

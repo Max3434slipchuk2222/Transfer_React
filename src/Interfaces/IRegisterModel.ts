@@ -4,4 +4,6 @@ export interface IRegisterModel {
     confirmPassword: string;
     firstName: string;
     lastName: string;
+    phone: string;
+    image: FileList | null;
 }

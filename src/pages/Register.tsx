@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import {Formik, Form, Field, ErrorMessage, type FormikHelpers} from 'formik';
 import * as yup from 'yup';
 import type {IRegisterModel} from "../Interfaces/IRegisterModel.ts";
+
+const phoneRegExp = /^\+380\d{9}$/;
 
 const RegisterSchema = yup.object({
     firstName: yup.string().required("Введіть ім'я"),
@@ -11,12 +14,16 @@ const RegisterSchema = yup.object({
     password: yup.string().required("Введіть пароль").min(6, "Мінімум 6 символів"),
     confirmPassword: yup.string()
         .oneOf([yup.ref('password')], 'Паролі не співпадають')
-        .required('Підтвердіть пароль')
+        .required('Підтвердіть пароль'),
+    phone: yup.string()
+        .matches(phoneRegExp, 'Невірний формат')
+        .required("Введіть номер телефону"),
 });
 
 const RegisterPage = () => {
     const { register } = useAuth();
     const navigate = useNavigate();
+    const [preview, setPreview] = useState<string | null>(null);
 
     const handleSubmit = async (values: IRegisterModel, { setSubmitting, setStatus }:FormikHelpers<IRegisterModel>) => {
         try {
@@ -34,15 +41,37 @@ const RegisterPage = () => {
             <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg">
                 <h1 className="text-3xl font-bold text-center text-gray-900">Реєстрація</h1>
 
-                <Formik
-                    initialValues={{ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' }}
-                    validationSchema={RegisterSchema}
-                    onSubmit={handleSubmit}
-                >
-                    {({ isSubmitting, status }) => (
+                <Formik<IRegisterModel> initialValues={{ firstName: '', lastName: '', email: '', password: '', confirmPassword: '', phone: '', image: null }} validationSchema={RegisterSchema} onSubmit={handleSubmit}>
+                    {({ isSubmitting, status, setFieldValue }) => (
                         <Form className="space-y-4">
                             {status && <div className="text-red-500 text-center text-sm bg-red-50 p-2 rounded">{status}</div>}
+                            <div className="flex flex-col items-center gap-2 mb-4">
+                                <label
+                                    htmlFor="imageUpload"
+                                    className="cursor-pointer group relative w-24 h-24 rounded-full overflow-hidden flex items-center justify-center"
+                                >
 
+                                    <img
+                                        src={preview || "images (8).png"}
+                                        alt="Avatar"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </label>
+                                <input
+                                    id="imageUpload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.currentTarget.files?.[0];
+                                        if (file) {
+                                            setFieldValue("image", e.currentTarget.files);
+                                            setPreview(URL.createObjectURL(file));
+                                        }
+                                    }}
+                                />
+                                <ErrorMessage name="image" component="div" className="text-red-500 text-xs mt-1" />
+                            </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Ім'я</label>
@@ -60,6 +89,11 @@ const RegisterPage = () => {
                                 <label className="block text-sm font-medium text-gray-700">Email</label>
                                 <Field name="email" type="email" className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
                                 <ErrorMessage name="email" component="div" className="text-red-500 text-xs mt-1" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Phone</label>
+                                <Field name="phone" type="text" placeholder="+380xxxxxxxxx" className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
+                                <ErrorMessage name="phone" component="div" className="text-red-500 text-xs mt-1" />
                             </div>
 
                             <div>

@@ -61,18 +61,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     const register = async (model: IRegisterModel) => {
         try {
-            const registerData = {
-                firstName: model.firstName,
-                lastName: model.lastName,
-                email: model.email,
-                password: model.password
-            };
-            const result = await axios.post(`${APP_ENV.API_BASE_URL}/api/account/register`, registerData);
+            const formData = new FormData();
+
+
+            formData.append('firstName', model.firstName);
+            formData.append('lastName', model.lastName);
+            formData.append('email', model.email);
+            formData.append('password', model.password);
+            formData.append('phone', model.phone);
+            formData.append('confirmPassword', model.confirmPassword);
+
+
+            if (model.image && model.image.length > 0) {
+                formData.append('image', model.image[0]);
+            }
+            const result = await axios.post(
+                `${APP_ENV.API_BASE_URL}/api/account/register`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
             const { token } = result.data;
             localStorage.setItem("token", token);
             await loadUser();
         } catch (error) {
-            console.error(error);
+            console.error("Registration error:", error);
+            throw error; //
         }
     };
 

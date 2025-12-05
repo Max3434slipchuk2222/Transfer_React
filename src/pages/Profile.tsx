@@ -19,35 +19,24 @@ const Profile = () => {
                         <img
                             className="h-48 w-full object-cover md:w-48"
                             src={finalImage}
-                            alt={user.firstName}
+                            alt={user.fullName}
                             onError={(e) => {
                                 (e.target as HTMLImageElement).src = "https://via.placeholder.com/150";
                             }}
                         />
                     </div>
                     <div className="p-8 w-full">
-                        <div className={"flex flex-row gap-2"}>
-                            <h1 className="block mt-1 text-2xl leading-tight font-medium text-black">
-                                {user.firstName}
-                            </h1>
-                            <h1 className="block mt-1 text-2xl leading-tight font-medium text-black">
-                                {user.lastName}
-                            </h1>
-                        </div>
-
+                        <h1 className="block mt-1 text-2xl leading-tight font-medium text-black">
+                            {user.fullName}
+                        </h1>
 
                         <p className="mt-2 text-gray-500">
                             {user.email}
                         </p>
 
-                        <div className="mt-4">
-                            <span className="text-gray-700 font-bold">Ролі: </span>
-                            {user.roles.map((role, index) => (
-                                <span key={index} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mr-2">
-                                    {role}
-                                </span>
-                            ))}
-                        </div>
+                        <p className="mt-2 text-gray-500">
+                            {user.phone}
+                        </p>
 
                         <div className="mt-8 border-t pt-6">
                             <button
